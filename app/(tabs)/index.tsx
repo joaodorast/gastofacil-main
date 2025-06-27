@@ -1,14 +1,16 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
-import { Calendar, DollarSign, Plus, TrendingUp, TrendingDown } from 'lucide-react-native';
+import { Calendar, DollarSign, Plus, TrendingUp, TrendingDown, History, FileText } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { gastos } = useApp();
+  const { gastos, receitas } = useApp();
   const [totalDia, setTotalDia] = useState(0);
   const [totalMes, setTotalMes] = useState(0);
+  const [receitasMes, setReceitasMes] = useState(0);
+  const [saldoMes, setSaldoMes] = useState(0);
 
   useEffect(() => {
     // Calcular totais
@@ -23,9 +25,18 @@ export default function HomeScreen() {
       g.data >= inicioMes
     );
 
+    const receitasMesAtual = receitas.filter(r => 
+      r.data >= inicioMes
+    );
+
+    const totalGastosMes = gastosMes.reduce((sum, g) => sum + g.valor, 0);
+    const totalReceitasMes = receitasMesAtual.reduce((sum, r) => sum + r.valor, 0);
+
     setTotalDia(gastosDia.reduce((sum, g) => sum + g.valor, 0));
-    setTotalMes(gastosMes.reduce((sum, g) => sum + g.valor, 0));
-  }, [gastos]);
+    setTotalMes(totalGastosMes);
+    setReceitasMes(totalReceitasMes);
+    setSaldoMes(totalReceitasMes - totalGastosMes);
+  }, [gastos, receitas]);
 
   const formatarMoeda = (valor: number) => {
     return `R$ ${valor.toFixed(2).replace('.', ',')}`;
@@ -45,10 +56,26 @@ export default function HomeScreen() {
     router.push('/(tabs)/adicionar');
   };
 
+  const irParaHistorico = () => {
+    router.push('/historico');
+  };
+
+  const irParaReceitas = () => {
+    router.push('/receitas');
+  };
+
+  const irParaRelatorios = () => {
+    router.push('/relatorios');
+  };
+
+  const irParaLembretes = () => {
+    router.push('/lembretes');
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Controle de Gastos</Text>
+        <Text style={styles.headerTitle}>GastoFácil</Text>
         <Text style={styles.headerDate}>{obterDataFormatada()}</Text>
       </View>
 
@@ -60,7 +87,7 @@ export default function HomeScreen() {
           </View>
           <Text style={styles.cardValue}>{formatarMoeda(totalDia)}</Text>
           <Text style={styles.cardSubtext}>
-            {gastos.filter(g => g.data.toDateString() === new Date().toDateString()).length} gastos registrados
+            {gastos.filter(g => g.data.toDateString() === new Date().toDateString()).length} gastos
           </Text>
         </View>
 
@@ -71,8 +98,59 @@ export default function HomeScreen() {
           </View>
           <Text style={styles.cardValue}>{formatarMoeda(totalMes)}</Text>
           <Text style={styles.cardSubtext}>
-            {gastos.length} gastos no total
+            {gastos.length} gastos total
           </Text>
+        </View>
+      </View>
+
+      <View style={styles.saldoContainer}>
+        <View style={[styles.saldoCard, { borderLeftColor: saldoMes >= 0 ? '#10B981' : '#EF4444' }]}>
+          <View style={styles.saldoHeader}>
+            <TrendingUp size={20} color={saldoMes >= 0 ? '#10B981' : '#EF4444'} />
+            <Text style={styles.saldoTitle}>Saldo do Mês</Text>
+          </View>
+          <Text style={[styles.saldoValue, { color: saldoMes >= 0 ? '#10B981' : '#EF4444' }]}>
+            {formatarMoeda(saldoMes)}
+          </Text>
+          <View style={styles.saldoDetalhes}>
+            <Text style={styles.saldoDetalhe}>
+              Receitas: <Text style={styles.receitaText}>{formatarMoeda(receitasMes)}</Text>
+            </Text>
+            <Text style={styles.saldoDetalhe}>
+              Gastos: <Text style={styles.gastoText}>{formatarMoeda(totalMes)}</Text>
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.actionsContainer}>
+        <Text style={styles.actionsTitle}>Ações Rápidas</Text>
+        
+        <View style={styles.actionsGrid}>
+          <TouchableOpacity style={[styles.actionCard, { backgroundColor: '#EF4444' }]} onPress={irParaAdicionar}>
+            <Plus size={24} color="#FFFFFF" />
+            <Text style={styles.actionText}>Adicionar Gasto</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.actionCard, { backgroundColor: '#10B981' }]} onPress={irParaReceitas}>
+            <TrendingUp size={24} color="#FFFFFF" />
+            <Text style={styles.actionText}>Receitas</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.actionCard, { backgroundColor: '#3B82F6' }]} onPress={irParaHistorico}>
+            <History size={24} color="#FFFFFF" />
+            <Text style={styles.actionText}>Histórico</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.actionCard, { backgroundColor: '#F59E0B' }]} onPress={irParaLembretes}>
+            <Calendar size={24} color="#FFFFFF" />
+            <Text style={styles.actionText}>Lembretes</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.actionCard, { backgroundColor: '#8B5CF6' }]} onPress={irParaRelatorios}>
+            <FileText size={24} color="#FFFFFF" />
+            <Text style={styles.actionText}>Relatórios</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -117,15 +195,6 @@ export default function HomeScreen() {
           ))
         )}
       </View>
-
-      {gastos.length > 0 && (
-        <View style={styles.actions}>
-          <TouchableOpacity style={styles.actionButton} onPress={irParaAdicionar}>
-            <Plus size={20} color="#FFFFFF" />
-            <Text style={styles.actionButtonText}>Adicionar Gasto</Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </ScrollView>
   );
 }
@@ -194,6 +263,92 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter-Regular',
     color: '#9CA3AF',
+  },
+  saldoContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  saldoCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 20,
+    borderLeftWidth: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  saldoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  saldoTitle: {
+    fontSize: 16,
+    fontFamily: 'Inter-SemiBold',
+    color: '#6B7280',
+    marginLeft: 8,
+  },
+  saldoValue: {
+    fontSize: 28,
+    fontFamily: 'Inter-Bold',
+    marginBottom: 8,
+  },
+  saldoDetalhes: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  saldoDetalhe: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
+  receitaText: {
+    color: '#10B981',
+    fontFamily: 'Inter-SemiBold',
+  },
+  gastoText: {
+    color: '#EF4444',
+    fontFamily: 'Inter-SemiBold',
+  },
+  actionsContainer: {
+    padding: 20,
+  },
+  actionsTitle: {
+    fontSize: 20,
+    fontFamily: 'Inter-Bold',
+    color: '#111827',
+    marginBottom: 16,
+  },
+  actionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  actionCard: {
+    width: '48%',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  actionText: {
+    fontSize: 14,
+    fontFamily: 'Inter-SemiBold',
+    color: '#FFFFFF',
+    marginTop: 8,
+    textAlign: 'center',
   },
   section: {
     padding: 20,
@@ -285,24 +440,6 @@ const styles = StyleSheet.create({
   gastoTipoText: {
     fontSize: 10,
     fontFamily: 'Inter-Bold',
-    color: '#FFFFFF',
-  },
-  actions: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  actionButton: {
-    backgroundColor: '#6B7280',
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  actionButtonText: {
-    fontSize: 16,
-    fontFamily: 'Inter-SemiBold',
     color: '#FFFFFF',
   },
 });

@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Chrome as Home, Plus, History, TrendingUp, Target, FileText, Settings, DollarSign, Bell } from 'lucide-react-native';
+import { Home, Plus, TrendingUp, Target, Settings } from 'lucide-react-native';
 import { AppProvider } from '@/contexts/AppContext';
 
 export default function TabLayout() {
@@ -14,12 +14,12 @@ export default function TabLayout() {
             borderTopColor: '#E5E7EB',
             paddingTop: 8,
             paddingBottom: 8,
-            height: 80,
+            height: 70,
           },
-          tabBarActiveTintColor: '#374151',
+          tabBarActiveTintColor: '#6B7280',
           tabBarInactiveTintColor: '#9CA3AF',
           tabBarLabelStyle: {
-            fontSize: 10,
+            fontSize: 11,
             fontWeight: '600',
             marginTop: 4,
             fontFamily: 'Inter-SemiBold',
@@ -44,11 +44,11 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="receitas"
+          name="analise"
           options={{
-            title: 'Receitas',
+            title: 'Análise',
             tabBarIcon: ({ size, color }) => (
-              <DollarSign size={size} color={color} />
+              <TrendingUp size={size} color={color} />
             ),
           }}
         />
@@ -62,45 +62,9 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="relatorios"
-          options={{
-            title: 'Relatórios',
-            tabBarIcon: ({ size, color }) => (
-              <FileText size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="lembretes"
-          options={{
-            title: 'Lembretes',
-            tabBarIcon: ({ size, color }) => (
-              <Bell size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="historico"
-          options={{
-            title: 'Histórico',
-            tabBarIcon: ({ size, color }) => (
-              <History size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="analise"
-          options={{
-            title: 'Análise',
-            tabBarIcon: ({ size, color }) => (
-              <TrendingUp size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
           name="configuracoes"
           options={{
-            title: 'Config',
+            title: 'Mais',
             tabBarIcon: ({ size, color }) => (
               <Settings size={size} color={color} />
             ),

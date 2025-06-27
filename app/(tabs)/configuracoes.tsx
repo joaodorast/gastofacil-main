@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Alert } from 'react-native';
 import { useState } from 'react';
-import { Settings, User, Bell, Shield, Palette, Download, Upload, Trash2, CircleHelp as HelpCircle, LogOut, ChevronRight } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { Settings, User, Bell, Shield, Palette, Download, Upload, Trash2, CircleHelp as HelpCircle, LogOut, ChevronRight, History, FileText, DollarSign, Calendar } from 'lucide-react-native';
 import { useApp } from '@/contexts/AppContext';
 
 export default function ConfiguracoesScreen() {
+  const router = useRouter();
   const { limparGastos } = useApp();
   const [notificacoes, setNotificacoes] = useState(true);
   const [modoEscuro, setModoEscuro] = useState(false);
@@ -58,6 +60,22 @@ export default function ConfiguracoesScreen() {
     );
   };
 
+  const irParaHistorico = () => {
+    router.push('/historico');
+  };
+
+  const irParaReceitas = () => {
+    router.push('/receitas');
+  };
+
+  const irParaRelatorios = () => {
+    router.push('/relatorios');
+  };
+
+  const irParaLembretes = () => {
+    router.push('/lembretes');
+  };
+
   const ConfigItem = ({ 
     icon: Icon, 
     title, 
@@ -101,10 +119,47 @@ export default function ConfiguracoesScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Configurações</Text>
+        <Text style={styles.headerTitle}>Mais Opções</Text>
         <Text style={styles.headerSubtitle}>
-          Personalize sua experiência
+          Acesse todas as funcionalidades
         </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Funcionalidades</Text>
+        <View style={styles.sectionContent}>
+          <ConfigItem
+            icon={History}
+            title="Histórico"
+            subtitle="Ver todos os gastos registrados"
+            onPress={irParaHistorico}
+            color="#3B82F6"
+          />
+          
+          <ConfigItem
+            icon={DollarSign}
+            title="Receitas"
+            subtitle="Gerenciar entradas financeiras"
+            onPress={irParaReceitas}
+            color="#10B981"
+          />
+          
+          <ConfigItem
+            icon={FileText}
+            title="Relatórios"
+            subtitle="Análises detalhadas e exportação"
+            onPress={irParaRelatorios}
+            color="#8B5CF6"
+          />
+          
+          <ConfigItem
+            icon={Calendar}
+            title="Lembretes"
+            subtitle="Contas a pagar e notificações"
+            onPress={irParaLembretes}
+            color="#F59E0B"
+          />
+        </View>
       </View>
 
       <View style={styles.section}>
