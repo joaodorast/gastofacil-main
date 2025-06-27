@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Plus, TrendingUp, Target, Settings } from 'lucide-react-native';
+import { Chrome as Home, Plus, TrendingUp, Target, Settings } from 'lucide-react-native';
 import { AppProvider } from '@/contexts/AppContext';
 
 export default function TabLayout() {
